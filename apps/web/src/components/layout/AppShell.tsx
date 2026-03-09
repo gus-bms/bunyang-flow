@@ -1,5 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import type { PropsWithChildren } from "react";
+
+import { usePreferenceStore } from "../../store/preferences";
 
 const navItems = [
   { to: "/", label: "홈" },
@@ -10,6 +12,8 @@ const navItems = [
 ];
 
 export function AppShell({ children }: PropsWithChildren) {
+  const comparisonIds = usePreferenceStore((state) => state.comparisonIds);
+
   return (
     <div className="app-shell">
       <header className="app-topbar">
@@ -17,12 +21,23 @@ export function AppShell({ children }: PropsWithChildren) {
           <p className="eyebrow">Bunyang Flow</p>
           <h1>분양과 청약 실행을 위한 흐름</h1>
         </div>
-        <NavLink
-          className="secondary-link"
-          to="/onboarding"
-        >
-          조건 설정
-        </NavLink>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          {comparisonIds.length > 0 && (
+            <Link
+              to="/compare"
+              className="secondary-link"
+            >
+              비교함
+              <span className="compare-badge">{comparisonIds.length}</span>
+            </Link>
+          )}
+          <NavLink
+            className="secondary-link"
+            to="/onboarding"
+          >
+            조건 설정
+          </NavLink>
+        </div>
       </header>
       <main className="app-main">{children}</main>
       <nav className="bottom-nav">

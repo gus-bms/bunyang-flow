@@ -12,6 +12,7 @@ import { SchedulePage } from "../pages/SchedulePage";
 import { ProfilePage } from "../pages/ProfilePage";
 import { OnboardingPage } from "../pages/OnboardingPage";
 import { ComparisonPage } from "../pages/ComparisonPage";
+import { AlertsPage } from "../pages/AlertsPage";
 
 export function App() {
   return (
@@ -60,6 +61,10 @@ export function App() {
         <Route
           path="/compare"
           element={<ComparisonPage />}
+        />
+        <Route
+          path="/alerts"
+          element={<AlertsPage />}
         />
       </Routes>
     </AppShell>

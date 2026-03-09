@@ -394,6 +394,340 @@ select {
   color: #fff7ef;
 }
 
+/* ── Range input ── */
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #637089;
+}
+
+/* ── Filter row (sort select) ── */
+.filter-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.filter-row select {
+  border: 1px solid rgba(23, 32, 51, 0.12);
+  border-radius: 18px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Highlight lists (입지 요약 / 유의사항) ── */
+.highlight-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+
+.highlight-list--caution {
+  color: #8f3b1a;
+}
+
+.highlight-list--caution li::marker {
+  content: "⚠ ";
+}
+
+/* ── Timeline status variants ── */
+.timeline__item--completed {
+  opacity: 0.48;
+  background: #ece8e2;
+}
+
+.timeline__item--completed strong {
+  text-decoration: line-through;
+}
+
+.timeline__item--ongoing {
+  background: #ffe0d3;
+  border: 1.5px solid rgba(143, 59, 26, 0.18);
+}
+
+.timeline__item--upcoming {
+  background: #f8f4ef;
+}
+
+/* ── Comparison ── */
+.comparison-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.comparison-col {
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 28px;
+  padding: 20px;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  box-shadow: 0 16px 40px rgba(56, 51, 43, 0.08);
+  display: grid;
+  gap: 14px;
+}
+
+.comparison-col__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.comparison-col__name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.comparison-row {
+  display: grid;
+  gap: 4px;
+}
+
+.comparison-label {
+  font-size: 12px;
+  color: #637089;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Saved page card wrap ── */
+.saved-card-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.unsave-button {
+  border: 1px solid rgba(23, 32, 51, 0.12);
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  font-size: 13px;
+  color: #637089;
+  width: 100%;
+}
+
+.unsave-button:hover {
+  background: #ffe0d3;
+  color: #8f3b1a;
+  border-color: rgba(143, 59, 26, 0.2);
+}
+
+/* ── Quick & active filter chips ── */
+.quick-filters {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.active-filters {
+  flex-wrap: wrap;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #172033;
+  color: #fff7ef;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* ── Outline button ── */
+.outline-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(23, 32, 51, 0.18);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ── OfferingCard actions ── */
+.offering-card__actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── D-day badge ── */
+.d-day-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #ffe8bc;
+  color: #7b4a00;
+}
+
+.d-day-badge--today {
+  background: #ffe0d3;
+  color: #8f3b1a;
+}
+
+.d-day-badge--past {
+  background: #ece8e2;
+  color: #637089;
+}
+
+/* ── Onboarding step indicator ── */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.12);
+  transition:
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.step-dot--done {
+  background: rgba(23, 32, 51, 0.36);
+}
+
+.step-dot--active {
+  background: #172033;
+  transform: scale(1.35);
+}
+
+.step-nav {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+/* ── Alert toggle row ── */
+.alert-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f8f4ef;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.18);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 180ms ease;
+}
+
+.toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(23, 32, 51, 0.2);
+  transition: transform 180ms ease;
+}
+
+.toggle-switch--on {
+  background: #172033;
+}
+
+.toggle-switch--on::after {
+  transform: translateX(18px);
+}
+
+/* ── Compare count badge ── */
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #bc5a2e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+/* ── Profile detail grid ── */
+.profile-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.profile-item {
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8f4ef;
+  display: grid;
+  gap: 4px;
+}
+
+.profile-item__label {
+  font-size: 11px;
+  color: #637089;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.profile-item__value {
+  font-weight: 700;
+}
+
+/* ── Schedule group ── */
+.schedule-group {
+  display: grid;
+  gap: 8px;
+}
+
+.schedule-group__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-event-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f8f4ef;
+}
+
+.schedule-event-row__info {
+  display: grid;
+  gap: 4px;
+}
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 36px 24px 104px;

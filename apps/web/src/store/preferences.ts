@@ -6,10 +6,12 @@ interface PreferenceState {
   profile: UserProfile;
   savedOfferingIds: string[];
   comparisonIds: string[];
+  alertedOfferingIds: string[];
   onboardingCompleted: boolean;
   updateProfile: (next: Partial<UserProfile>) => void;
   toggleSavedOffering: (offeringId: string) => void;
   toggleComparison: (offeringId: string) => void;
+  toggleAlert: (offeringId: string) => void;
   setSpecialSupplyFlags: (flags: SpecialSupplyType[]) => void;
   completeOnboarding: () => void;
 }
@@ -30,6 +32,7 @@ export const usePreferenceStore = create<PreferenceState>()(
       profile: defaultProfile,
       savedOfferingIds: ["gangdong-river-park", "mapo-central-view"],
       comparisonIds: [],
+      alertedOfferingIds: ["gangdong-river-park"],
       onboardingCompleted: false,
       updateProfile: (next) =>
         set((state) => ({
@@ -54,6 +57,12 @@ export const usePreferenceStore = create<PreferenceState>()(
           }
           return { comparisonIds: [...state.comparisonIds, offeringId] };
         }),
+      toggleAlert: (offeringId) =>
+        set((state) => ({
+          alertedOfferingIds: state.alertedOfferingIds.includes(offeringId)
+            ? state.alertedOfferingIds.filter((id) => id !== offeringId)
+            : [...state.alertedOfferingIds, offeringId],
+        })),
       setSpecialSupplyFlags: (flags) =>
         set((state) => ({
           profile: {
