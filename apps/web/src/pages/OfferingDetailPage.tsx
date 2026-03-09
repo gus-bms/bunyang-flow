@@ -11,6 +11,8 @@ import { usePreferenceStore } from "../store/preferences";
 export function OfferingDetailPage() {
   const params = useParams();
   const profile = usePreferenceStore((state) => state.profile);
+  const savedOfferingIds = usePreferenceStore((state) => state.savedOfferingIds);
+  const toggleSavedOffering = usePreferenceStore((state) => state.toggleSavedOffering);
   const offeringId = params.id ?? "";
 
   const { data: offering } = useQuery({
@@ -38,11 +40,22 @@ export function OfferingDetailPage() {
     return <div className="panel">단지 정보를 불러오는 중입니다.</div>;
   }
 
+  const isSaved = savedOfferingIds.includes(offering.id);
+
   return (
     <div className="page-stack">
       <PageHeader
         title={offering.complexName}
         description={offering.regionLabel}
+        action={
+          <button
+            type="button"
+            className={isSaved ? "secondary-link" : "outline-button"}
+            onClick={() => toggleSavedOffering(offering.id)}
+          >
+            {isSaved ? "★ 저장됨" : "☆ 관심 저장"}
+          </button>
+        }
       />
 
       <section className="panel detail-hero">
@@ -86,6 +99,17 @@ export function OfferingDetailPage() {
         <p className="eyebrow">규제 정보</p>
         <RegulationBadgeList regulation={offering.regulationInfo} />
       </section>
+
+      {offering.locationHighlights.length > 0 && (
+        <section className="panel">
+          <p className="eyebrow">입지 요약</p>
+          <ul className="highlight-list">
+            {offering.locationHighlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="panel">
         <p className="eyebrow">경쟁률 참고</p>
@@ -133,14 +157,28 @@ export function OfferingDetailPage() {
           {offering.scheduleEvents.map((event) => (
             <div
               key={event.id}
-              className="timeline__item"
+              className={`timeline__item timeline__item--${event.status}`}
             >
               <strong>{event.displayLabel}</strong>
               <span>{formatDate(event.startsAt)}</span>
+              {event.endsAt && event.endsAt !== event.startsAt && (
+                <span className="muted"> ~ {formatDate(event.endsAt)}</span>
+              )}
             </div>
           ))}
         </div>
       </section>
+
+      {offering.noticeHighlights.length > 0 && (
+        <section className="panel">
+          <p className="eyebrow">유의사항</p>
+          <ul className="highlight-list highlight-list--caution">
+            {offering.noticeHighlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

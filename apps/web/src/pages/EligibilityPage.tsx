@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 import { PageHeader } from "../components/common/PageHeader";
 import { checkEligibility } from "../lib/api";
 import { usePreferenceStore } from "../store/preferences";
+
+const specialSupplyOptions = [
+  { value: "newlywed" as const, label: "신혼부부" },
+  { value: "first_time_buyer" as const, label: "생애최초" },
+  { value: "multi_child" as const, label: "다자녀" },
+  { value: "elder_support" as const, label: "노부모부양" },
+] as const;
 
 export function EligibilityPage() {
   const profile = usePreferenceStore((state) => state.profile);
@@ -19,6 +27,19 @@ export function EligibilityPage() {
     updateProfile(form);
     mutation.mutate(form);
   }
+
+  function toggleSpecialSupply(value: (typeof specialSupplyOptions)[number]["value"]) {
+    setForm((current) => ({
+      ...current,
+      specialSupplyFlags: current.specialSupplyFlags.includes(value)
+        ? current.specialSupplyFlags.filter((item) => item !== value)
+        : [...current.specialSupplyFlags, value],
+    }));
+  }
+
+  const resultLink = mutation.data?.eligibleSupplyTypes.length
+    ? `/offerings?stages=special_supply_open,priority_1_open,priority_2_open`
+    : `/offerings`;
 
   return (
     <div className="page-stack">
@@ -75,21 +96,55 @@ export function EligibilityPage() {
             />
             세대주
           </label>
+          <label className="toggle-field">
+            <input
+              type="checkbox"
+              checked={form.hasSubscriptionAccount}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  hasSubscriptionAccount: event.target.checked,
+                }))
+              }
+            />
+            청약통장 보유
+          </label>
         </div>
 
-        <label className="field">
-          <span>청약통장 가입 개월 수</span>
-          <input
-            type="number"
-            value={form.subscriptionPeriodMonths}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                subscriptionPeriodMonths: Number(event.target.value),
-              }))
-            }
-          />
-        </label>
+        {form.hasSubscriptionAccount && (
+          <label className="field">
+            <span>청약통장 가입 개월 수</span>
+            <input
+              type="number"
+              min={0}
+              value={form.subscriptionPeriodMonths}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  subscriptionPeriodMonths: Number(event.target.value),
+                }))
+              }
+            />
+          </label>
+        )}
+
+        <div className="field">
+          <span>특별공급 대상</span>
+          <div className="chip-row">
+            {specialSupplyOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={
+                  form.specialSupplyFlags.includes(option.value) ? "filter-chip is-active" : "filter-chip"
+                }
+                onClick={() => toggleSpecialSupply(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <button
           type="submit"
@@ -102,7 +157,9 @@ export function EligibilityPage() {
       {mutation.data ? (
         <section className="panel">
           <p className="eyebrow">진단 결과</p>
-          <h3>{mutation.data.eligibleSupplyTypes.join(", ") || "우선 일반공급 기준부터 확인 필요"}</h3>
+          <h3>
+            {mutation.data.eligibleSupplyTypes.join(", ") || "우선 일반공급 기준부터 확인 필요"}
+          </h3>
           <div className="list-stack">
             {mutation.data.requiresReview.map((item) => (
               <p key={item}>{item}</p>
@@ -111,6 +168,12 @@ export function EligibilityPage() {
               <p key={item}>{item}</p>
             ))}
           </div>
+          <Link
+            to={resultLink}
+            className="primary-link"
+          >
+            해당 단지 보러가기 →
+          </Link>
         </section>
       ) : null}
     </div>

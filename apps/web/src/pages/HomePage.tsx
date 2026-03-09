@@ -17,12 +17,24 @@ export function HomePage() {
 
   const items = data?.items ?? [];
   const actionable = items.filter((item) => getActionableStages().includes(item.currentStage));
+  const specialSupplyActive = items.filter((item) => item.currentStage === "special_supply_open");
+  const imminent = items.filter(
+    (item) => item.currentStage === "winner_announced" || item.currentStage === "contract_open",
+  );
   const upcoming = items.filter((item) => item.currentStage === "planned" || item.currentStage === "announcement_open");
   const recommended = items.filter(
     (item) =>
       item.regionLabel.includes(profile.residenceRegion1) &&
       (!profile.budgetMax || item.minSalePrice <= profile.budgetMax),
   );
+
+  const quickFilters = [
+    { label: "분양 예정", stages: "planned" },
+    { label: "모집 공고", stages: "announcement_open" },
+    { label: "특별공급", stages: "special_supply_open" },
+    { label: "1순위 접수", stages: "priority_1_open" },
+    { label: "발표 예정", stages: "winner_announced" },
+  ];
 
   return (
     <div className="page-stack">
@@ -66,6 +78,18 @@ export function HomePage() {
         </div>
       </section>
 
+      <div className="chip-row quick-filters">
+        {quickFilters.map((filter) => (
+          <Link
+            key={filter.stages}
+            to={`/offerings?stages=${filter.stages}`}
+            className="filter-chip"
+          >
+            {filter.label}
+          </Link>
+        ))}
+      </div>
+
       <section className="section-block">
         <div className="section-block__header">
           <h3>지금 청약 가능한 단지</h3>
@@ -80,6 +104,40 @@ export function HomePage() {
           ))}
         </div>
       </section>
+
+      {specialSupplyActive.length > 0 && (
+        <section className="section-block">
+          <div className="section-block__header">
+            <h3>특별공급 진행 중인 단지</h3>
+            <span>{specialSupplyActive.length}건</span>
+          </div>
+          <div className="card-grid">
+            {specialSupplyActive.map((offering) => (
+              <OfferingCard
+                key={offering.id}
+                offering={offering}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {imminent.length > 0 && (
+        <section className="section-block">
+          <div className="section-block__header">
+            <h3>일정이 임박한 단지</h3>
+            <span>발표·계약 진행</span>
+          </div>
+          <div className="card-grid">
+            {imminent.map((offering) => (
+              <OfferingCard
+                key={offering.id}
+                offering={offering}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section-block">
         <div className="section-block__header">

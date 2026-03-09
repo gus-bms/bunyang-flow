@@ -11,6 +11,7 @@ import { SavedPage } from "../pages/SavedPage";
 import { SchedulePage } from "../pages/SchedulePage";
 import { ProfilePage } from "../pages/ProfilePage";
 import { OnboardingPage } from "../pages/OnboardingPage";
+import { ComparisonPage } from "../pages/ComparisonPage";
 
 export function App() {
   return (
@@ -55,6 +56,10 @@ export function App() {
         <Route
           path="/me"
           element={<ProfilePage />}
+        />
+        <Route
+          path="/compare"
+          element={<ComparisonPage />}
         />
       </Routes>
     </AppShell>

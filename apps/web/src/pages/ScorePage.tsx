@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { PageHeader } from "../components/common/PageHeader";
+import { OfferingCard } from "../components/offerings/OfferingCard";
 import { calculateScore, getOfferings } from "../lib/api";
 
 export function ScorePage() {
@@ -48,9 +49,12 @@ export function ScorePage() {
         }}
       >
         <label className="field">
-          <span>무주택 기간(년)</span>
+          <span>무주택 기간 — {form.homelessPeriodYears}년</span>
           <input
-            type="number"
+            type="range"
+            min={0}
+            max={15}
+            step={1}
             value={form.homelessPeriodYears}
             onChange={(event) =>
               setForm((current) => ({
@@ -59,12 +63,19 @@ export function ScorePage() {
               }))
             }
           />
+          <div className="range-labels">
+            <span>0년</span>
+            <span>15년 이상</span>
+          </div>
         </label>
 
         <label className="field">
-          <span>부양가족 수</span>
+          <span>부양가족 수 — {form.dependentCount}명</span>
           <input
-            type="number"
+            type="range"
+            min={0}
+            max={6}
+            step={1}
             value={form.dependentCount}
             onChange={(event) =>
               setForm((current) => ({
@@ -73,12 +84,19 @@ export function ScorePage() {
               }))
             }
           />
+          <div className="range-labels">
+            <span>0명</span>
+            <span>6명 이상</span>
+          </div>
         </label>
 
         <label className="field">
-          <span>청약통장 가입 기간(년)</span>
+          <span>청약통장 가입 기간 — {form.subscriptionPeriodYears}년</span>
           <input
-            type="number"
+            type="range"
+            min={0}
+            max={15}
+            step={1}
             value={form.subscriptionPeriodYears}
             onChange={(event) =>
               setForm((current) => ({
@@ -87,6 +105,10 @@ export function ScorePage() {
               }))
             }
           />
+          <div className="range-labels">
+            <span>0년</span>
+            <span>15년 이상</span>
+          </div>
         </label>
 
         <button
@@ -105,14 +127,17 @@ export function ScorePage() {
             <div className="metric-card">
               <span>무주택 기간</span>
               <strong>{mutation.data.homelessScore}점</strong>
+              <p>최대 32점</p>
             </div>
             <div className="metric-card">
               <span>부양가족</span>
               <strong>{mutation.data.dependentScore}점</strong>
+              <p>최대 35점</p>
             </div>
             <div className="metric-card">
               <span>통장 가입기간</span>
               <strong>{mutation.data.subscriptionScore}점</strong>
+              <p>최대 17점</p>
             </div>
           </div>
           <p className="muted">{mutation.data.assessmentLabel}</p>
@@ -120,13 +145,17 @@ export function ScorePage() {
       ) : null}
 
       {recommended.length ? (
-        <section className="panel">
-          <p className="eyebrow">도전해볼 만한 단지</p>
-          <div className="list-stack">
+        <section className="section-block">
+          <div className="section-block__header">
+            <h3>도전해볼 만한 단지</h3>
+            <span>내 가점 기준</span>
+          </div>
+          <div className="card-grid">
             {recommended.map((offering) => (
-              <p key={offering.id}>
-                {offering.complexName} / {offering.regionLabel} / {offering.currentStage}
-              </p>
+              <OfferingCard
+                key={offering.id}
+                offering={offering}
+              />
             ))}
           </div>
         </section>

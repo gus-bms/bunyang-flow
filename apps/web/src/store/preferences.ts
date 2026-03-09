@@ -5,9 +5,11 @@ import type { SpecialSupplyType, UserProfile } from "@bunyang-flow/shared";
 interface PreferenceState {
   profile: UserProfile;
   savedOfferingIds: string[];
+  comparisonIds: string[];
   onboardingCompleted: boolean;
   updateProfile: (next: Partial<UserProfile>) => void;
   toggleSavedOffering: (offeringId: string) => void;
+  toggleComparison: (offeringId: string) => void;
   setSpecialSupplyFlags: (flags: SpecialSupplyType[]) => void;
   completeOnboarding: () => void;
 }
@@ -27,6 +29,7 @@ export const usePreferenceStore = create<PreferenceState>()(
     (set) => ({
       profile: defaultProfile,
       savedOfferingIds: ["gangdong-river-park", "mapo-central-view"],
+      comparisonIds: [],
       onboardingCompleted: false,
       updateProfile: (next) =>
         set((state) => ({
@@ -41,6 +44,16 @@ export const usePreferenceStore = create<PreferenceState>()(
             ? state.savedOfferingIds.filter((id) => id !== offeringId)
             : [...state.savedOfferingIds, offeringId],
         })),
+      toggleComparison: (offeringId) =>
+        set((state) => {
+          if (state.comparisonIds.includes(offeringId)) {
+            return { comparisonIds: state.comparisonIds.filter((id) => id !== offeringId) };
+          }
+          if (state.comparisonIds.length >= 5) {
+            return state; // 최대 5개 제한
+          }
+          return { comparisonIds: [...state.comparisonIds, offeringId] };
+        }),
       setSpecialSupplyFlags: (flags) =>
         set((state) => ({
           profile: {

@@ -316,7 +316,7 @@
 ### 제약
 - user_id + housing_offering_id는 unique
 
-## 4.8 user_alert
+## 4.11 user_alert
 
 ### 목적
 - 사용자별 알림 설정을 관리한다.
@@ -343,7 +343,7 @@
   - `email`
   - `sms`
 
-## 4.9 complex_comparison
+## 4.12 complex_comparison
 
 ### 목적
 - 비교함에 담긴 단지를 저장한다.

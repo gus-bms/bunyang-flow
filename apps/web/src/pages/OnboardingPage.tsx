@@ -8,6 +8,7 @@ const specialSupplyOptions = [
   { value: "newlywed", label: "신혼부부" },
   { value: "first_time_buyer", label: "생애최초" },
   { value: "multi_child", label: "다자녀" },
+  { value: "elder_support", label: "노부모부양" },
 ] as const;
 
 export function OnboardingPage() {
@@ -17,6 +18,8 @@ export function OnboardingPage() {
   const completeOnboarding = usePreferenceStore((state) => state.completeOnboarding);
   const [budgetMax, setBudgetMax] = useState(profile.budgetMax ?? 800000000);
   const [region, setRegion] = useState(profile.residenceRegion1);
+  const [isHomeless, setIsHomeless] = useState(profile.isHomeless);
+  const [isHeadOfHousehold, setIsHeadOfHousehold] = useState(profile.isHeadOfHousehold);
 
   return (
     <div className="page-stack">
@@ -38,8 +41,27 @@ export function OnboardingPage() {
           </select>
         </label>
 
+        <div className="inline-fields">
+          <label className="toggle-field">
+            <input
+              type="checkbox"
+              checked={isHomeless}
+              onChange={(event) => setIsHomeless(event.target.checked)}
+            />
+            무주택
+          </label>
+          <label className="toggle-field">
+            <input
+              type="checkbox"
+              checked={isHeadOfHousehold}
+              onChange={(event) => setIsHeadOfHousehold(event.target.checked)}
+            />
+            세대주
+          </label>
+        </div>
+
         <label className="field">
-          <span>예산 상한</span>
+          <span>예산 상한 — {Math.round(budgetMax / 100000000)}억 이하</span>
           <input
             type="range"
             min={300000000}
@@ -48,7 +70,10 @@ export function OnboardingPage() {
             value={budgetMax}
             onChange={(event) => setBudgetMax(Number(event.target.value))}
           />
-          <strong>{Math.round(budgetMax / 100000000)}억 이하</strong>
+          <div className="range-labels">
+            <span>3억</span>
+            <span>12억</span>
+          </div>
         </label>
 
         <div className="field">
@@ -82,6 +107,8 @@ export function OnboardingPage() {
             updateProfile({
               residenceRegion1: region,
               budgetMax,
+              isHomeless,
+              isHeadOfHousehold,
             });
             completeOnboarding();
             startTransition(() => navigate("/"));
