@@ -1,0 +1,16 @@
+{
+  "name": "bunyang-flow",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @bunyang-flow/shared && npm run build -w @bunyang-flow/api && npm run build -w @bunyang-flow/web",
+    "check": "npm run check -w @bunyang-flow/shared && npm run check -w @bunyang-flow/api && npm run check -w @bunyang-flow/web",
+    "dev:api": "npm run build -w @bunyang-flow/shared && npm run dev -w @bunyang-flow/api",
+    "dev:web": "npm run build -w @bunyang-flow/shared && npm run dev -w @bunyang-flow/web",
+    "prepare:shared": "npm run build -w @bunyang-flow/shared"
+  }
+}

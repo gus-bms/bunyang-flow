@@ -1,0 +1,25 @@
+{
+  "name": "@bunyang-flow/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@bunyang-flow/shared": "file:../../packages/shared",
+    "@tanstack/react-query": "^5.68.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1"
+  }
+}
