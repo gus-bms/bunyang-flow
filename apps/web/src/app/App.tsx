@@ -13,6 +13,8 @@ import { ProfilePage } from "../pages/ProfilePage";
 import { OnboardingPage } from "../pages/OnboardingPage";
 import { ComparisonPage } from "../pages/ComparisonPage";
 import { AlertsPage } from "../pages/AlertsPage";
+import { LoginPage } from "../pages/LoginPage";
+import { KakaoCallbackPage } from "../pages/KakaoCallbackPage";
 
 export function App() {
   return (
@@ -65,6 +67,14 @@ export function App() {
         <Route
           path="/alerts"
           element={<AlertsPage />}
+        />
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+        <Route
+          path="/auth/callback"
+          element={<KakaoCallbackPage />}
         />
       </Routes>
     </AppShell>

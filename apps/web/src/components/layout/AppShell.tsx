@@ -2,6 +2,7 @@ import { NavLink, Link } from "react-router-dom";
 import type { PropsWithChildren } from "react";
 
 import { usePreferenceStore } from "../../store/preferences";
+import { useAuthStore } from "../../store/auth";
 
 const navItems = [
   { to: "/", label: "홈" },
@@ -13,6 +14,8 @@ const navItems = [
 
 export function AppShell({ children }: PropsWithChildren) {
   const comparisonIds = usePreferenceStore((state) => state.comparisonIds);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   return (
     <div className="app-shell">
@@ -31,12 +34,33 @@ export function AppShell({ children }: PropsWithChildren) {
               <span className="compare-badge">{comparisonIds.length}</span>
             </Link>
           )}
-          <NavLink
-            className="secondary-link"
-            to="/onboarding"
-          >
-            조건 설정
-          </NavLink>
+          {user ? (
+            <div className="auth-user">
+              {user.profileImageUrl && (
+                <img
+                  src={user.profileImageUrl}
+                  alt={user.nickname}
+                  className="auth-user__avatar"
+                />
+              )}
+              <span className="auth-user__name">{user.nickname}</span>
+              <button
+                type="button"
+                className="secondary-link"
+                onClick={logout}
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+              >
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="kakao-login-button kakao-login-button--small"
+            >
+              카카오 로그인
+            </Link>
+          )}
         </div>
       </header>
       <main className="app-main">{children}</main>

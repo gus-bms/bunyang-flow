@@ -11,15 +11,23 @@
   "dependencies": {
     "@bunyang-flow/shared": "file:../../packages/shared",
     "@nestjs/common": "^11.1.8",
+    "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.1.8",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-kakao": "^1.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/node": "^20.17.30",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-kakao": "^1.0.3",
     "tsx": "^4.20.5",
     "typescript": "^5.8.2"
   }

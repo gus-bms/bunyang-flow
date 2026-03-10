@@ -177,3 +177,10 @@ export interface ScoreResult {
   totalScore: number;
   assessmentLabel: string;
 }
+
+export interface AuthUser {
+  id: string;
+  email?: string;
+  nickname: string;
+  profileImageUrl?: string;
+}

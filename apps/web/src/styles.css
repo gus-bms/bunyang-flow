@@ -728,6 +728,53 @@ select {
   gap: 4px;
 }
 
+/* ── Kakao Login ─────────────────────────────────────────── */
+.kakao-login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fee500;
+  color: #191919;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.kakao-login-button:hover {
+  background-color: #f0d900;
+}
+
+.kakao-login-button--small {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+/* ── Auth User (AppShell topbar) ─────────────────────────── */
+.auth-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-user__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.auth-user__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 36px 24px 104px;

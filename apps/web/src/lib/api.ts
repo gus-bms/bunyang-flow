@@ -8,10 +8,25 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
 
+function getAuthToken(): string | null {
+  try {
+    const raw = localStorage.getItem("bunyang-flow-auth");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { state?: { token?: string } };
+    return parsed.state?.token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getAuthToken();
+  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...authHeader,
       ...(init?.headers ?? {}),
     },
     ...init,
