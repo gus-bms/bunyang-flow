@@ -2,6 +2,9 @@
   "name": "bunyang-flow",
   "version": "0.1.0",
   "private": true,
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -9,6 +12,11 @@
   "scripts": {
     "build": "npm run build -w @bunyang-flow/shared && npm run build -w @bunyang-flow/api && npm run build -w @bunyang-flow/web",
     "check": "npm run check -w @bunyang-flow/shared && npm run check -w @bunyang-flow/api && npm run check -w @bunyang-flow/web",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "db:ps": "docker compose ps",
+    "db:up": "docker compose up -d postgres",
+    "dev": "concurrently -k -n api,web \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm run build -w @bunyang-flow/shared && npm run dev -w @bunyang-flow/api",
     "dev:web": "npm run build -w @bunyang-flow/shared && npm run dev -w @bunyang-flow/web",
     "prepare:shared": "npm run build -w @bunyang-flow/shared"
