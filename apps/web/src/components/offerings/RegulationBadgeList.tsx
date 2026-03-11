@@ -4,7 +4,7 @@ import { buildRegulationBadges } from "../../lib/format";
 
 export function RegulationBadgeList({ regulation }: { regulation: RegulationInfo }) {
   return (
-    <div className="badge-list">
+    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
       {buildRegulationBadges(regulation).map((badge) => (
         <span
           key={badge}

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
-import { PageHeader } from "../components/common/PageHeader";
 import { OfferingCard } from "../components/offerings/OfferingCard";
 import { getOfferings } from "../lib/api";
 import { usePreferenceStore } from "../store/preferences";
@@ -10,8 +9,8 @@ import { usePreferenceStore } from "../store/preferences";
 type SortKey = "schedule" | "saved_recent";
 
 export function SavedPage() {
-  const savedOfferingIds = usePreferenceStore((state) => state.savedOfferingIds);
-  const toggleSavedOffering = usePreferenceStore((state) => state.toggleSavedOffering);
+  const savedOfferingIds = usePreferenceStore((s) => s.savedOfferingIds);
+  const toggleSavedOffering = usePreferenceStore((s) => s.toggleSavedOffering);
   const [sortKey, setSortKey] = useState<SortKey>("schedule");
 
   const { data } = useQuery({
@@ -20,40 +19,26 @@ export function SavedPage() {
   });
 
   const items = useMemo(() => {
-    const base = (data?.items ?? []).filter((offering) => savedOfferingIds.includes(offering.id));
-
-    if (sortKey === "saved_recent") {
-      return [...base].sort(
-        (a, b) => savedOfferingIds.indexOf(a.id) - savedOfferingIds.indexOf(b.id),
-      );
-    }
-
-    // 일정 임박순: 다음 일정 날짜 오름차순
+    const base = (data?.items ?? []).filter((o) => savedOfferingIds.includes(o.id));
+    if (sortKey === "saved_recent") return [...base].sort((a, b) => savedOfferingIds.indexOf(a.id) - savedOfferingIds.indexOf(b.id));
     return [...base].sort((a, b) => a.nextScheduleAt.localeCompare(b.nextScheduleAt));
   }, [data, savedOfferingIds, sortKey]);
 
   return (
     <div className="page-stack">
-      <PageHeader
-        title="관심 단지"
-        description="즐겨찾기보다 일정 관리 대상에 가깝게 보이도록 구성했습니다."
-        action={
-          items.length > 0 ? (
-            <Link
-              to="/compare"
-              className="secondary-link"
-            >
-              비교함 보기
-            </Link>
-          ) : undefined
-        }
-      />
+      <div style={{ padding: "16px 16px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, letterSpacing: "-0.5px" }}>관심 단지</h2>
+        {items.length > 0 && (
+          <Link to="/compare" style={{ fontSize: 15, color: "var(--c-blue)", fontWeight: 500 }}>비교함</Link>
+        )}
+      </div>
 
       {items.length > 0 && (
-        <div className="filter-row">
+        <div style={{ padding: "8px 16px", display: "flex", justifyContent: "flex-end" }}>
           <select
             value={sortKey}
-            onChange={(event) => setSortKey(event.target.value as SortKey)}
+            onChange={(e) => setSortKey(e.target.value as SortKey)}
+            style={{ border: "1px solid var(--c-sep)", borderRadius: 8, padding: "6px 10px", background: "var(--c-surface)", fontSize: 13 }}
           >
             <option value="schedule">일정 임박순</option>
             <option value="saved_recent">저장 최신순</option>
@@ -61,13 +46,15 @@ export function SavedPage() {
         </div>
       )}
 
-      <section className="card-grid">
-        {items.length ? (
+      <div className="card-grid">
+        {items.length === 0 ? (
+          <div style={{ background: "var(--c-surface)", borderRadius: 14, padding: "48px 20px", textAlign: "center" }}>
+            <p style={{ fontSize: 15, color: "var(--c-label3)", margin: "0 0 12px" }}>저장한 단지가 없습니다</p>
+            <Link to="/offerings" style={{ fontSize: 15, color: "var(--c-blue)", fontWeight: 500 }}>분양 찾기</Link>
+          </div>
+        ) : (
           items.map((offering) => (
-            <div
-              key={offering.id}
-              className="saved-card-wrap"
-            >
+            <div key={offering.id} style={{ display: "grid", gap: 6 }}>
               <OfferingCard offering={offering} />
               <button
                 type="button"
@@ -78,18 +65,8 @@ export function SavedPage() {
               </button>
             </div>
           ))
-        ) : (
-          <div className="panel">
-            <p>저장한 단지가 없습니다.</p>
-            <Link
-              to="/offerings"
-              className="secondary-link"
-            >
-              분양 찾기로 이동
-            </Link>
-          </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }

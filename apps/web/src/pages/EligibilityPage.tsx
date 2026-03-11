@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
-import { PageHeader } from "../components/common/PageHeader";
 import { checkEligibility } from "../lib/api";
 import { usePreferenceStore } from "../store/preferences";
 
@@ -14,26 +13,24 @@ const specialSupplyOptions = [
 ] as const;
 
 export function EligibilityPage() {
-  const profile = usePreferenceStore((state) => state.profile);
-  const updateProfile = usePreferenceStore((state) => state.updateProfile);
+  const profile = usePreferenceStore((s) => s.profile);
+  const updateProfile = usePreferenceStore((s) => s.updateProfile);
   const [form, setForm] = useState(profile);
 
-  const mutation = useMutation({
-    mutationFn: checkEligibility,
-  });
+  const mutation = useMutation({ mutationFn: checkEligibility });
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     updateProfile(form);
     mutation.mutate(form);
   }
 
-  function toggleSpecialSupply(value: (typeof specialSupplyOptions)[number]["value"]) {
-    setForm((current) => ({
-      ...current,
-      specialSupplyFlags: current.specialSupplyFlags.includes(value)
-        ? current.specialSupplyFlags.filter((item) => item !== value)
-        : [...current.specialSupplyFlags, value],
+  function toggleSpecial(value: (typeof specialSupplyOptions)[number]["value"]) {
+    setForm((c) => ({
+      ...c,
+      specialSupplyFlags: c.specialSupplyFlags.includes(value)
+        ? c.specialSupplyFlags.filter((f) => f !== value)
+        : [...c.specialSupplyFlags, value],
     }));
   }
 
@@ -43,139 +40,126 @@ export function EligibilityPage() {
 
   return (
     <div className="page-stack">
-      <PageHeader
-        title="청약 자격 진단"
-        description="확정 판단이 아니라, 지금 볼 가치가 있는 공급 유형을 빠르게 가려내는 용도입니다."
-      />
+      <div style={{ padding: "16px 16px 0" }}>
+        <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, letterSpacing: "-0.5px" }}>자격 진단</h2>
+        <p style={{ fontSize: 14, color: "var(--c-label3)", margin: "4px 0 0" }}>
+          지원 가능한 공급 유형을 빠르게 확인합니다
+        </p>
+      </div>
 
-      <form
-        className="panel form-stack"
-        onSubmit={submit}
-      >
-        <label className="field">
-          <span>거주 지역</span>
-          <select
-            value={form.residenceRegion1}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                residenceRegion1: event.target.value,
-              }))
-            }
-          >
-            <option value="서울">서울</option>
-            <option value="경기">경기</option>
-            <option value="인천">인천</option>
-          </select>
-        </label>
-
-        <div className="inline-fields">
-          <label className="toggle-field">
+      <form onSubmit={submit} style={{ margin: "12px 16px 0", display: "grid", gap: 0 }}>
+        {/* 지역 */}
+        <div className="inset-group" style={{ marginBottom: 16 }}>
+          <label className="inset-group__row" style={{ cursor: "pointer" }}>
+            <span className="inset-group__label">거주 지역</span>
+            <select
+              value={form.residenceRegion1}
+              onChange={(e) => setForm((c) => ({ ...c, residenceRegion1: e.target.value }))}
+              style={{ border: "none", background: "transparent", fontSize: 15, color: "var(--c-label3)", textAlign: "right", outline: "none" }}
+            >
+              <option value="서울">서울</option>
+              <option value="경기">경기</option>
+              <option value="인천">인천</option>
+            </select>
+          </label>
+          <label className="inset-group__row" style={{ cursor: "pointer" }}>
+            <span className="inset-group__label">무주택</span>
             <input
               type="checkbox"
               checked={form.isHomeless}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  isHomeless: event.target.checked,
-                }))
-              }
+              onChange={(e) => setForm((c) => ({ ...c, isHomeless: e.target.checked }))}
+              style={{ width: 20, height: 20, accentColor: "var(--c-blue)" }}
             />
-            무주택
           </label>
-          <label className="toggle-field">
+          <label className="inset-group__row" style={{ cursor: "pointer" }}>
+            <span className="inset-group__label">세대주</span>
             <input
               type="checkbox"
               checked={form.isHeadOfHousehold}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  isHeadOfHousehold: event.target.checked,
-                }))
-              }
+              onChange={(e) => setForm((c) => ({ ...c, isHeadOfHousehold: e.target.checked }))}
+              style={{ width: 20, height: 20, accentColor: "var(--c-blue)" }}
             />
-            세대주
           </label>
-          <label className="toggle-field">
+          <label className="inset-group__row" style={{ cursor: "pointer" }}>
+            <span className="inset-group__label">청약통장 보유</span>
             <input
               type="checkbox"
               checked={form.hasSubscriptionAccount}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  hasSubscriptionAccount: event.target.checked,
-                }))
-              }
-            />
-            청약통장 보유
-          </label>
-        </div>
-
-        {form.hasSubscriptionAccount && (
-          <label className="field">
-            <span>청약통장 가입 개월 수</span>
-            <input
-              type="number"
-              min={0}
-              value={form.subscriptionPeriodMonths}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  subscriptionPeriodMonths: Number(event.target.value),
-                }))
-              }
+              onChange={(e) => setForm((c) => ({ ...c, hasSubscriptionAccount: e.target.checked }))}
+              style={{ width: 20, height: 20, accentColor: "var(--c-blue)" }}
             />
           </label>
-        )}
-
-        <div className="field">
-          <span>특별공급 대상</span>
-          <div className="chip-row">
-            {specialSupplyOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={
-                  form.specialSupplyFlags.includes(option.value) ? "filter-chip is-active" : "filter-chip"
-                }
-                onClick={() => toggleSpecialSupply(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          {form.hasSubscriptionAccount && (
+            <label className="inset-group__row">
+              <span className="inset-group__label">가입 개월</span>
+              <input
+                type="number"
+                min={0}
+                value={form.subscriptionPeriodMonths}
+                onChange={(e) => setForm((c) => ({ ...c, subscriptionPeriodMonths: Number(e.target.value) }))}
+                style={{ border: "none", background: "transparent", fontSize: 15, color: "var(--c-label3)", textAlign: "right", width: 80, outline: "none" }}
+              />
+            </label>
+          )}
         </div>
 
-        <button
-          type="submit"
-          className="primary-button"
-        >
+        {/* 특별공급 */}
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--c-label3)", textTransform: "uppercase" as const, letterSpacing: "0.05em", padding: "0 0 6px" }}>
+          특별공급 대상
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {specialSupplyOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={form.specialSupplyFlags.includes(opt.value) ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => toggleSpecial(opt.value)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        <button type="submit" className="primary-button" style={{ width: "100%", borderRadius: 12 }}>
           진단 실행
         </button>
       </form>
 
-      {mutation.data ? (
-        <section className="panel">
-          <p className="eyebrow">진단 결과</p>
-          <h3>
-            {mutation.data.eligibleSupplyTypes.join(", ") || "우선 일반공급 기준부터 확인 필요"}
-          </h3>
-          <div className="list-stack">
+      {/* 결과 */}
+      {mutation.data && (
+        <div style={{ margin: "16px 16px 0" }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--c-label3)", textTransform: "uppercase" as const, letterSpacing: "0.05em", padding: "0 0 6px" }}>
+            진단 결과
+          </div>
+          <div className="inset-group">
+            <div className="inset-group__row">
+              <span className="inset-group__label">지원 가능</span>
+              <span className="inset-group__value" style={{ color: "var(--c-blue)", fontWeight: 600 }}>
+                {mutation.data.eligibleSupplyTypes.join(", ") || "확인 필요"}
+              </span>
+            </div>
             {mutation.data.requiresReview.map((item) => (
-              <p key={item}>{item}</p>
+              <div key={item} className="inset-group__row">
+                <span className="inset-group__label" style={{ color: "var(--c-orange)" }}>{item}</span>
+              </div>
             ))}
             {mutation.data.cautions.map((item) => (
-              <p key={item}>{item}</p>
+              <div key={item} className="inset-group__row">
+                <span className="inset-group__label" style={{ color: "var(--c-red)" }}>{item}</span>
+              </div>
             ))}
           </div>
           <Link
             to={resultLink}
             className="primary-link"
+            style={{ width: "100%", marginTop: 12, borderRadius: 12, display: "flex" }}
           >
-            해당 단지 보러가기 →
+            해당 단지 보기
           </Link>
-        </section>
-      ) : null}
+        </div>
+      )}
+
+      <div style={{ height: 16 }} />
     </div>
   );
 }

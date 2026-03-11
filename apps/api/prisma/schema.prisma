@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OfferingStage {
+  planned
+  announcement_open
+  special_supply_open
+  priority_1_open
+  priority_2_open
+  winner_announced
+  contract_open
+  move_in_pending
+  closed
+}
+
+enum ScheduleEventType {
+  announcement
+  special_supply
+  priority_1
+  priority_2
+  winner_announcement
+  contract
+  move_in
+}
+
+enum ScheduleStatus {
+  upcoming
+  ongoing
+  completed
+}
+
+enum OfferingType {
+  private_sale
+  public_sale
+}
+
+enum SaleCategory {
+  apt
+  officetel
+  public_housing
+}
+
+enum SupplyKind {
+  general
+  special
+}
+
+enum SpecialSupplyType {
+  newlywed
+  first_time_buyer
+  multi_child
+  elder_support
+  institution_recommendation
+}
+
+enum SpeculationZoneType {
+  speculation_overheated
+  adjustment_target
+  non_regulated
+}
+
+model HousingOffering {
+  id                 String        @id @default(cuid())
+  slug               String        @unique
+  complexName        String
+  regionLabel        String
+  addressFull        String
+  latitude           Float
+  longitude          Float
+  offeringType       OfferingType
+  saleCategory       SaleCategory
+  currentStage       OfferingStage @default(planned)
+  announcementName   String
+  announcementDate   String
+  moveInPlannedAt    String
+  dataCheckedAt      DateTime      @default(now())
+  totalHouseholds    Int
+  developerName      String
+  builderName        String
+  supplySummary      String
+  summaryText        String
+  minSalePrice       BigInt        @default(0)
+  maxSalePrice       BigInt        @default(0)
+  areaRangeLabel     String
+  nextScheduleLabel  String
+  nextScheduleAt     String
+  noticeHighlights   String[]
+  locationHighlights String[]
+
+  housingTypes     HousingType[]
+  scheduleEvents   ScheduleEvent[]
+  supplyRules      SupplyRule[]
+  regulationInfo   RegulationInfo?
+  competitionRates CompetitionRate[]
+  userInterests    UserInterest[]
+  userAlerts       UserAlert[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HousingType {
+  id                      String  @id @default(cuid())
+  typeName                String
+  exclusiveAreaM2         Float
+  supplyHouseholdsTotal   Int
+  supplyHouseholdsGeneral Int
+  supplyHouseholdsSpecial Int
+  salePriceMin            BigInt
+  salePriceMax            BigInt
+  contractDepositRate     Int
+  middlePaymentRate       Int
+  balanceRate             Int
+  optionPriceNote         String?
+
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+}
+
+model ScheduleEvent {
+  id           String            @id @default(cuid())
+  eventType    ScheduleEventType
+  startsAt     String
+  endsAt       String?
+  displayLabel String
+  status       ScheduleStatus
+
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+}
+
+model SupplyRule {
+  id                          String             @id @default(cuid())
+  supplyKind                  SupplyKind
+  specialSupplyType           SpecialSupplyType?
+  residentRegionRule          String
+  homelessRequired            Boolean
+  headOfHouseholdRequired     Boolean
+  subscriptionAccountRequired Boolean
+  subscriptionMinPeriodMonths Int
+  incomeRuleText              String?
+  assetRuleText               String?
+  noteText                    String?
+
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+}
+
+model RegulationInfo {
+  id                        String              @id @default(cuid())
+  priceCapApplied           Boolean
+  resaleRestrictionMonths   Int
+  resaleRestrictionNote     String
+  residencyObligationMonths Int
+  rewinRestrictionYears     Int
+  speculationZoneType       SpeculationZoneType
+  interimLoanAvailable      Boolean
+  interimLoanNote           String
+
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String          @unique
+}
+
+model CompetitionRate {
+  id                String             @id @default(cuid())
+  typeName          String
+  supplyKind        SupplyKind
+  specialSupplyType SpecialSupplyType?
+  recruitmentCount  Int
+  applicantCount    Int
+  competitionRatio  Float
+  minWinningScore   Int?
+  maxWinningScore   Int?
+  avgWinningScore   Int?
+
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+}
+
+model User {
+  id              String   @id
+  email           String?  @unique
+  nickname        String
+  profileImageUrl String?
+  role            String   @default("user")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  profile           UserProfile?
+  score             UserScore?
+  interests         UserInterest[]
+  alerts            UserAlert[]
+  pushSubscriptions PushSubscription[]
+}
+
+model UserProfile {
+  id                       String              @id @default(cuid())
+  residenceRegion1         String              @default("")
+  residenceRegion2         String?
+  isHomeless               Boolean             @default(false)
+  isHeadOfHousehold        Boolean             @default(false)
+  hasSubscriptionAccount   Boolean             @default(false)
+  subscriptionPeriodMonths Int                 @default(0)
+  specialSupplyFlags       SpecialSupplyType[]
+  budgetMax                BigInt?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  updatedAt DateTime @updatedAt
+}
+
+model UserScore {
+  id                      String @id @default(cuid())
+  homelessPeriodYears     Int    @default(0)
+  dependentCount          Int    @default(0)
+  subscriptionPeriodYears Int    @default(0)
+  homelessScore           Int    @default(0)
+  dependentScore          Int    @default(0)
+  subscriptionScore       Int    @default(0)
+  totalScore              Int    @default(0)
+  assessmentLabel         String @default("")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  updatedAt DateTime @updatedAt
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, endpoint])
+}
+
+model UserInterest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+
+  @@unique([userId, offeringId])
+}
+
+model UserAlert {
+  id         String              @id @default(cuid())
+  eventTypes ScheduleEventType[]
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  offering   HousingOffering @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+  offeringId String
+
+  @@unique([userId, offeringId])
+}

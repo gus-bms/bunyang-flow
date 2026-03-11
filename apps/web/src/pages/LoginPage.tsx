@@ -7,7 +7,6 @@ export function LoginPage() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
 
-  // 이미 로그인된 경우 홈으로 이동
   if (user) {
     navigate("/", { replace: true });
     return null;
@@ -18,10 +17,11 @@ export function LoginPage() {
   }
 
   return (
-    <div className="page-content" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "24px" }}>
-      <div style={{ textAlign: "center" }}>
-        <h2 style={{ marginBottom: "8px" }}>로그인</h2>
-        <p className="eyebrow" style={{ color: "var(--color-text-secondary)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 24px 48px", background: "var(--c-bg)" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ fontSize: 56, marginBottom: 16 }}>🏠</div>
+        <h2 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.5px" }}>분양플로우</h2>
+        <p style={{ fontSize: 15, color: "var(--c-label3)", margin: 0, lineHeight: 1.6 }}>
           알림·관심 단지를 기기 간 동기화하려면 로그인하세요
         </p>
       </div>
@@ -30,12 +30,13 @@ export function LoginPage() {
         className="kakao-login-button"
         onClick={handleKakaoLogin}
         type="button"
+        style={{ width: "100%", maxWidth: 320, justifyContent: "center" }}
       >
         <KakaoIcon />
         카카오로 시작하기
       </button>
 
-      <p style={{ fontSize: "12px", color: "var(--color-text-secondary)", textAlign: "center", maxWidth: "280px", lineHeight: "1.6" }}>
+      <p style={{ fontSize: 13, color: "var(--c-label4)", textAlign: "center", maxWidth: 280, lineHeight: 1.6, marginTop: 20 }}>
         로그인 없이도 분양 탐색, 점수 계산, 조건 진단 등 대부분의 기능을 사용할 수 있습니다.
       </p>
     </div>
@@ -44,14 +45,7 @@ export function LoginPage() {
 
 function KakaoIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ flexShrink: 0 }}
-    >
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

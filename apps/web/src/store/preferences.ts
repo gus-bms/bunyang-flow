@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { SpecialSupplyType, UserProfile } from "@bunyang-flow/shared";
+import { addAlert, addInterest } from "../lib/api";
 
 interface PreferenceState {
   profile: UserProfile;
@@ -14,6 +15,7 @@ interface PreferenceState {
   toggleAlert: (offeringId: string) => void;
   setSpecialSupplyFlags: (flags: SpecialSupplyType[]) => void;
   completeOnboarding: () => void;
+  syncToServer: () => Promise<void>;
 }
 
 const defaultProfile: UserProfile = {
@@ -71,6 +73,13 @@ export const usePreferenceStore = create<PreferenceState>()(
           },
         })),
       completeOnboarding: () => set({ onboardingCompleted: true }),
+      syncToServer: async () => {
+        const { savedOfferingIds, alertedOfferingIds } = usePreferenceStore.getState();
+        await Promise.allSettled([
+          ...savedOfferingIds.map((id) => addInterest(id)),
+          ...alertedOfferingIds.map((id) => addAlert(id, [])),
+        ]);
+      },
     }),
     {
       name: "bunyang-flow-preferences",

@@ -145,6 +145,11 @@ export interface OfferingsFilter {
   maxPrice?: number;
   minArea?: number;
   specialSupplyType?: SpecialSupplyType;
+  // Map bounding box (optional)
+  swLat?: number;
+  swLng?: number;
+  neLat?: number;
+  neLng?: number;
 }
 
 export interface UserProfile {

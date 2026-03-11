@@ -5,17 +5,18 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { KakaoStrategy } from "./strategies/kakao.strategy";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? "bunyang-flow-dev-secret",
-      signOptions: { expiresIn: "7d" },
+      signOptions: { expiresIn: "15m" },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, KakaoStrategy, JwtStrategy],
+  providers: [AuthService, KakaoStrategy, JwtStrategy, JwtRefreshStrategy],
   exports: [JwtModule],
 })
 export class AuthModule {}

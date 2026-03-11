@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
-import { PageHeader } from "../components/common/PageHeader";
 import { getSchedule } from "../lib/api";
 import { formatDate } from "../lib/format";
 import { usePreferenceStore } from "../store/preferences";
@@ -20,9 +19,9 @@ function getDDayLabel(dateStr: string): { label: string; variant: string } {
 }
 
 export function SchedulePage() {
-  const savedOfferingIds = usePreferenceStore((state) => state.savedOfferingIds);
-  const alertedOfferingIds = usePreferenceStore((state) => state.alertedOfferingIds);
-  const toggleAlert = usePreferenceStore((state) => state.toggleAlert);
+  const savedOfferingIds = usePreferenceStore((s) => s.savedOfferingIds);
+  const alertedOfferingIds = usePreferenceStore((s) => s.alertedOfferingIds);
+  const toggleAlert = usePreferenceStore((s) => s.toggleAlert);
 
   const { data } = useQuery({
     queryKey: ["schedule", savedOfferingIds],
@@ -32,13 +31,11 @@ export function SchedulePage() {
   const grouped = useMemo(() => {
     const items = data?.items ?? [];
     const map = new Map<string, typeof items>();
-
     for (const item of items) {
-      const existing = map.get(item.offeringId) ?? [];
-      existing.push(item);
-      map.set(item.offeringId, existing);
+      const arr = map.get(item.offeringId) ?? [];
+      arr.push(item);
+      map.set(item.offeringId, arr);
     }
-
     return Array.from(map.entries()).map(([offeringId, events]) => ({
       offeringId,
       complexName: events[0]?.complexName ?? "",
@@ -48,44 +45,25 @@ export function SchedulePage() {
 
   return (
     <div className="page-stack">
-      <PageHeader
-        title="일정 캘린더"
-        description="관심 단지 기준으로 다가오는 모집공고, 접수, 발표, 계약 일정을 모아봅니다."
-        action={
-          <Link
-            to="/alerts"
-            className="secondary-link"
-          >
-            알림 설정
-          </Link>
-        }
-      />
+      <div style={{ padding: "16px 16px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, letterSpacing: "-0.5px" }}>일정</h2>
+        <Link to="/alerts" style={{ fontSize: 15, color: "var(--c-blue)", fontWeight: 500 }}>알림 설정</Link>
+      </div>
 
       {grouped.length === 0 && (
-        <div className="panel">
-          <p>관심 단지가 없습니다.</p>
-          <Link
-            to="/offerings"
-            className="secondary-link"
-          >
-            분양 찾기에서 단지 저장하기
-          </Link>
+        <div style={{ margin: "12px 16px 0", background: "var(--c-surface)", borderRadius: 14, padding: "48px 20px", textAlign: "center" }}>
+          <p style={{ fontSize: 15, color: "var(--c-label3)", margin: "0 0 12px" }}>관심 단지가 없습니다</p>
+          <Link to="/offerings" style={{ fontSize: 15, color: "var(--c-blue)", fontWeight: 500 }}>분양 찾기에서 추가</Link>
         </div>
       )}
 
       {grouped.map((group) => {
         const isAlerted = alertedOfferingIds.includes(group.offeringId);
-
         return (
-          <section
-            key={group.offeringId}
-            className="panel schedule-group"
-          >
-            <div className="schedule-group__header">
-              <Link
-                to={`/offerings/${group.offeringId}`}
-                className="comparison-col__name"
-              >
+          <div key={group.offeringId} style={{ marginTop: 8 }}>
+            {/* 단지 헤더 */}
+            <div style={{ padding: "12px 16px 6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Link to={`/offerings/${group.offeringId}`} style={{ fontSize: 17, fontWeight: 600, color: "var(--c-label)" }}>
                 {group.complexName}
               </Link>
               <button
@@ -96,24 +74,26 @@ export function SchedulePage() {
               />
             </div>
 
-            {group.events.map((event) => {
-              const dday = getDDayLabel(event.date);
-              return (
-                <div
-                  key={event.id}
-                  className="schedule-event-row"
-                >
-                  <div className="schedule-event-row__info">
-                    <strong>{event.label}</strong>
-                    <span className="muted">{formatDate(event.date)}</span>
+            {/* 이벤트 목록 */}
+            <div className="inset-group">
+              {group.events.map((event) => {
+                const dday = getDDayLabel(event.date);
+                return (
+                  <div key={event.id} className="inset-group__row">
+                    <div style={{ display: "grid", gap: 2 }}>
+                      <span style={{ fontSize: 15, fontWeight: 500 }}>{event.label}</span>
+                      <span style={{ fontSize: 13, color: "var(--c-label3)" }}>{formatDate(event.date)}</span>
+                    </div>
+                    <span className={`d-day-badge ${dday.variant}`}>{dday.label}</span>
                   </div>
-                  <span className={`d-day-badge ${dday.variant}`}>{dday.label}</span>
-                </div>
-              );
-            })}
-          </section>
+                );
+              })}
+            </div>
+          </div>
         );
       })}
+
+      <div style={{ height: 16 }} />
     </div>
   );
 }

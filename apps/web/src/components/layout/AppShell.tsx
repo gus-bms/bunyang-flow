@@ -5,11 +5,11 @@ import { usePreferenceStore } from "../../store/preferences";
 import { useAuthStore } from "../../store/auth";
 
 const navItems = [
-  { to: "/", label: "홈" },
-  { to: "/offerings", label: "분양 찾기" },
-  { to: "/schedule", label: "일정" },
-  { to: "/saved", label: "관심" },
-  { to: "/me", label: "마이" },
+  { to: "/", label: "홈", icon: "⌂" },
+  { to: "/offerings", label: "분양", icon: "◫" },
+  { to: "/schedule", label: "일정", icon: "◷" },
+  { to: "/saved", label: "관심", icon: "♡" },
+  { to: "/me", label: "마이", icon: "◉" },
 ];
 
 export function AppShell({ children }: PropsWithChildren) {
@@ -20,16 +20,10 @@ export function AppShell({ children }: PropsWithChildren) {
   return (
     <div className="app-shell">
       <header className="app-topbar">
-        <div>
-          <p className="eyebrow">Bunyang Flow</p>
-          <h1>분양과 청약 실행을 위한 흐름</h1>
-        </div>
+        <h1>분양플로우</h1>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {comparisonIds.length > 0 && (
-            <Link
-              to="/compare"
-              className="secondary-link"
-            >
+            <Link to="/compare" style={{ fontSize: 15, color: "var(--c-blue)", fontWeight: 500 }}>
               비교함
               <span className="compare-badge">{comparisonIds.length}</span>
             </Link>
@@ -46,9 +40,8 @@ export function AppShell({ children }: PropsWithChildren) {
               <span className="auth-user__name">{user.nickname}</span>
               <button
                 type="button"
-                className="secondary-link"
                 onClick={logout}
-                style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: 14, color: "var(--c-red)", fontWeight: 500 }}
               >
                 로그아웃
               </button>
@@ -69,11 +62,13 @@ export function AppShell({ children }: PropsWithChildren) {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === "/"}
             className={({ isActive }) =>
               isActive ? "bottom-nav__item is-active" : "bottom-nav__item"
             }
           >
-            {item.label}
+            <span className="bottom-nav__icon" aria-hidden="true">{item.icon}</span>
+            <span className="bottom-nav__label">{item.label}</span>
           </NavLink>
         ))}
       </nav>

@@ -147,6 +147,95 @@ export function calculateScore(input: ScoreInput): ScoreResult {
   };
 }
 
+// ── 자금 계획 시뮬레이션 ──────────────────────────────────────────────────────
+
+const INTERIM_LOAN_RATE = 0.035; // 참고용 평균 금리 3.5%
+
+export interface FundingInstallment {
+  label: string;
+  rate: number;
+  amount: number;
+  dueDate?: string; // YYYY-MM-DD
+}
+
+export interface FundingPlan {
+  totalPrice: number;
+  depositAmount: number;
+  interimTotal: number;
+  balanceAmount: number;
+  installments: FundingInstallment[];
+  interimLoanNeeded: number;
+  interimLoanInterestEst: number;
+  disclaimer: string;
+}
+
+export function calculateFundingPlan(
+  type: { salePriceMin: number; contractDepositRate: number; middlePaymentRate: number; balanceRate: number },
+  selfFund = 0,
+  contractDate?: Date,
+): FundingPlan {
+  const totalPrice = type.salePriceMin;
+  const depositAmount = Math.round((totalPrice * type.contractDepositRate) / 100);
+  const interimTotal = Math.round((totalPrice * type.middlePaymentRate) / 100);
+  const balanceAmount = Math.round((totalPrice * type.balanceRate) / 100);
+
+  const installments: FundingInstallment[] = [];
+
+  // 계약금
+  installments.push({
+    label: "계약금",
+    rate: type.contractDepositRate,
+    amount: depositAmount,
+    dueDate: contractDate ? formatDateStr(contractDate) : undefined,
+  });
+
+  // 중도금 (6회 분할)
+  const INTERIM_INSTALLMENTS = 6;
+  const interimEach = Math.round(interimTotal / INTERIM_INSTALLMENTS);
+  for (let i = 1; i <= INTERIM_INSTALLMENTS; i++) {
+    const dueDate = contractDate ? addMonths(contractDate, i * 3) : undefined;
+    installments.push({
+      label: `중도금 ${i}회`,
+      rate: Math.round(type.middlePaymentRate / INTERIM_INSTALLMENTS),
+      amount: i === INTERIM_INSTALLMENTS ? interimTotal - interimEach * (INTERIM_INSTALLMENTS - 1) : interimEach,
+      dueDate: dueDate ? formatDateStr(dueDate) : undefined,
+    });
+  }
+
+  // 잔금
+  installments.push({
+    label: "잔금",
+    rate: type.balanceRate,
+    amount: balanceAmount,
+  });
+
+  const interimLoanNeeded = Math.max(0, interimTotal - Math.max(0, selfFund - depositAmount));
+  const interimLoanPeriodYears = 1.5; // 평균 중도금 기간 가정
+  const interimLoanInterestEst = Math.round(interimLoanNeeded * INTERIM_LOAN_RATE * interimLoanPeriodYears);
+
+  return {
+    totalPrice,
+    depositAmount,
+    interimTotal,
+    balanceAmount,
+    installments,
+    interimLoanNeeded,
+    interimLoanInterestEst,
+    disclaimer:
+      "중도금 대출 금리는 참고용 평균 기준(3.5%)이며 실제와 다를 수 있습니다. 대출 가능 여부와 한도는 금융기관을 통해 별도 확인이 필요합니다.",
+  };
+}
+
+function formatDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function addMonths(d: Date, months: number): Date {
+  const result = new Date(d);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
+
 const specialSupplyLabels: Record<SpecialSupplyType, string> = {
   newlywed: "신혼부부 특별공급",
   first_time_buyer: "생애최초 특별공급",

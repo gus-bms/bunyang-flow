@@ -2,11 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { getActionableStages } from "@bunyang-flow/shared";
 import { Link } from "react-router-dom";
 
-import { PageHeader } from "../components/common/PageHeader";
 import { OfferingCard } from "../components/offerings/OfferingCard";
 import { getOfferings } from "../lib/api";
-import { formatPrice } from "../lib/format";
 import { usePreferenceStore } from "../store/preferences";
+
+// 빠른 메뉴 타일
+const QUICK_ACTIONS = [
+  { label: "자격 진단", to: "/eligibility", bg: "#007aff", icon: "✓" },
+  { label: "가점 계산", to: "/score",       bg: "#34c759", icon: "#" },
+  { label: "일정 보기", to: "/schedule",    bg: "#ff9500", icon: "◷" },
+  { label: "지도 보기", to: "/offerings/map", bg: "#5856d6", icon: "◎" },
+];
 
 export function HomePage() {
   const profile = usePreferenceStore((state) => state.profile);
@@ -17,162 +23,152 @@ export function HomePage() {
 
   const items = data?.items ?? [];
   const actionable = items.filter((item) => getActionableStages().includes(item.currentStage));
-  const specialSupplyActive = items.filter((item) => item.currentStage === "special_supply_open");
+  const specialSupply = items.filter((item) => item.currentStage === "special_supply_open");
   const imminent = items.filter(
     (item) => item.currentStage === "winner_announced" || item.currentStage === "contract_open",
   );
-  const upcoming = items.filter((item) => item.currentStage === "planned" || item.currentStage === "announcement_open");
+  const upcoming = items.filter(
+    (item) => item.currentStage === "planned" || item.currentStage === "announcement_open",
+  );
   const recommended = items.filter(
     (item) =>
+      profile.residenceRegion1 &&
       item.regionLabel.includes(profile.residenceRegion1) &&
       (!profile.budgetMax || item.minSalePrice <= profile.budgetMax),
   );
 
-  const quickFilters = [
-    { label: "분양 예정", stages: "planned" },
-    { label: "모집 공고", stages: "announcement_open" },
-    { label: "특별공급", stages: "special_supply_open" },
-    { label: "1순위 접수", stages: "priority_1_open" },
-    { label: "발표 예정", stages: "winner_announced" },
-  ];
+  const today = new Date();
+  const dateLabel = `${today.getMonth() + 1}월 ${today.getDate()}일`;
 
   return (
     <div className="page-stack">
-      <PageHeader
-        title="지금 행동 가능한 분양부터 정리합니다"
-        description="단지 소개보다 단계, 일정, 자격, 가격 순서로 바로 판단할 수 있게 구성했습니다."
-        action={
-          <Link
-            className="secondary-link"
-            to="/offerings"
-          >
-            전체 보기
-          </Link>
-        }
-      />
 
-      <section className="panel hero-panel">
-        <div>
-          <p className="eyebrow">내 조건 요약</p>
-          <h3>
-            {profile.residenceRegion1} / {profile.isHomeless ? "무주택" : "유주택"} / 예산{" "}
-            {profile.budgetMax ? formatPrice(profile.budgetMax) : "미설정"} 이하
-          </h3>
-          <p className="muted">
-            특별공급: {profile.specialSupplyFlags.length ? profile.specialSupplyFlags.join(", ") : "없음"}
-          </p>
+      {/* ── 홈 히어로 ── */}
+      <div className="home-hero">
+        <p className="home-hero__greeting">{dateLabel} 기준</p>
+        <h2 className="home-hero__title">분양 현황</h2>
+        <div className="home-stats">
+          <div className="home-stat">
+            <div className="home-stat__num">{actionable.length}</div>
+            <div className="home-stat__label">청약 중</div>
+          </div>
+          <div className="home-stat">
+            <div className="home-stat__num">{upcoming.length}</div>
+            <div className="home-stat__label">분양 예정</div>
+          </div>
+          <div className="home-stat">
+            <div className="home-stat__num">{imminent.length}</div>
+            <div className="home-stat__label">마감 임박</div>
+          </div>
         </div>
-        <div className="hero-panel__actions">
-          <Link
-            className="primary-link"
-            to="/eligibility"
-          >
-            자격 진단
-          </Link>
-          <Link
-            className="secondary-link"
-            to="/score"
-          >
-            가점 계산
-          </Link>
-        </div>
-      </section>
+      </div>
 
-      <div className="chip-row quick-filters">
-        {quickFilters.map((filter) => (
-          <Link
-            key={filter.stages}
-            to={`/offerings?stages=${filter.stages}`}
-            className="filter-chip"
-          >
-            {filter.label}
+      {/* ── 빠른 메뉴 ── */}
+      <div className="quick-actions">
+        {QUICK_ACTIONS.map((a) => (
+          <Link key={a.to} to={a.to} className="quick-action-tile">
+            <div
+              className="quick-action-tile__icon"
+              style={{ background: a.bg, color: "#fff" }}
+            >
+              {a.icon}
+            </div>
+            <span className="quick-action-tile__label">{a.label}</span>
           </Link>
         ))}
       </div>
 
-      <section className="section-block">
+      {/* ── 지금 청약 가능 ── */}
+      <section className="section-block" style={{ marginTop: 8 }}>
         <div className="section-block__header">
-          <h3>지금 청약 가능한 단지</h3>
-          <span>{actionable.length}건</span>
+          <h3>지금 청약 중</h3>
+          <Link to="/offerings" style={{ fontSize: 15, color: "var(--c-blue)" }}>
+            전체 보기
+          </Link>
         </div>
-        <div className="card-grid">
-          {actionable.map((offering) => (
-            <OfferingCard
-              key={offering.id}
-              offering={offering}
-            />
-          ))}
-        </div>
+        {actionable.length === 0 ? (
+          <p style={{ padding: "8px 16px 16px", color: "var(--c-label3)", fontSize: 14 }}>
+            현재 청약 중인 단지가 없습니다
+          </p>
+        ) : (
+          <div className="card-scroll">
+            {actionable.map((offering) => (
+              <OfferingCard key={offering.id} offering={offering} />
+            ))}
+          </div>
+        )}
       </section>
 
-      {specialSupplyActive.length > 0 && (
+      {/* ── 특별공급 진행 중 ── */}
+      {specialSupply.length > 0 && (
         <section className="section-block">
           <div className="section-block__header">
-            <h3>특별공급 진행 중인 단지</h3>
-            <span>{specialSupplyActive.length}건</span>
+            <h3>특별공급 중</h3>
+            <span style={{ fontSize: 13, color: "var(--c-label3)" }}>
+              {specialSupply.length}건
+            </span>
           </div>
-          <div className="card-grid">
-            {specialSupplyActive.map((offering) => (
-              <OfferingCard
-                key={offering.id}
-                offering={offering}
-              />
+          <div className="card-scroll">
+            {specialSupply.map((offering) => (
+              <OfferingCard key={offering.id} offering={offering} />
             ))}
           </div>
         </section>
       )}
 
+      {/* ── 마감 임박 ── */}
       {imminent.length > 0 && (
         <section className="section-block">
           <div className="section-block__header">
-            <h3>일정이 임박한 단지</h3>
-            <span>발표·계약 진행</span>
+            <h3>마감 임박</h3>
+            <span style={{ fontSize: 13, color: "var(--c-red)" }}>발표·계약</span>
           </div>
-          <div className="card-grid">
+          <div className="card-scroll">
             {imminent.map((offering) => (
-              <OfferingCard
-                key={offering.id}
-                offering={offering}
-              />
+              <OfferingCard key={offering.id} offering={offering} />
             ))}
           </div>
         </section>
       )}
 
+      {/* ── 분양 예정 ── */}
       <section className="section-block">
         <div className="section-block__header">
-          <h3>곧 공고가 나오는 단지</h3>
-          <Link
-            className="secondary-link"
-            to="/offerings?preset=upcoming"
-          >
+          <h3>분양 예정</h3>
+          <Link to="/offerings?preset=upcoming" style={{ fontSize: 15, color: "var(--c-blue)" }}>
             더보기
           </Link>
         </div>
-        <div className="card-grid">
-          {upcoming.map((offering) => (
-            <OfferingCard
-              key={offering.id}
-              offering={offering}
-            />
-          ))}
-        </div>
+        {upcoming.length === 0 ? (
+          <p style={{ padding: "8px 16px 16px", color: "var(--c-label3)", fontSize: 14 }}>
+            예정 단지가 없습니다
+          </p>
+        ) : (
+          <div className="card-scroll">
+            {upcoming.map((offering) => (
+              <OfferingCard key={offering.id} offering={offering} />
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className="section-block">
-        <div className="section-block__header">
-          <h3>내 조건에 맞는 추천 단지</h3>
-          <span>지역·예산 기준</span>
-        </div>
-        <div className="card-grid">
-          {recommended.map((offering) => (
-            <OfferingCard
-              key={offering.id}
-              offering={offering}
-            />
-          ))}
-        </div>
-      </section>
+      {/* ── 내 조건 추천 ── */}
+      {recommended.length > 0 && (
+        <section className="section-block" style={{ marginBottom: 8 }}>
+          <div className="section-block__header">
+            <h3>내 조건 추천</h3>
+            <span style={{ fontSize: 13, color: "var(--c-label3)" }}>
+              {profile.residenceRegion1} · 예산 기준
+            </span>
+          </div>
+          <div className="card-scroll">
+            {recommended.map((offering) => (
+              <OfferingCard key={offering.id} offering={offering} />
+            ))}
+          </div>
+        </section>
+      )}
+
     </div>
   );
 }
